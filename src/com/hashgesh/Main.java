@@ -56,15 +56,26 @@ public class Main {
         } else if (ptr.isFilled()) {
 
             if(getLeafValue(ptr.left) != getLeafValue(ptr.right)){
-                Node subParent = new Node();
-                subParent.isLeaf = false;
-                subParent.left = ptr.right;
-                ptr.right.parent = subParent;
-                subParent.right = new Node(pair.getKey().toString(), (Integer) pair.getValue(), true, subParent, null, null);
-                subParent.setCount(subParent.right.count + subParent.left.count);
-                ptr.setCount(subParent.count + ptr.left.count);
-                ptr.right = subParent;
-                head = ptr;
+                if(getLeafValue(ptr.right).equals((Integer) pair.getValue())) {
+                    Node subParent = new Node();
+                    subParent.isLeaf = false;
+                    subParent.left = ptr.right;
+                    ptr.right.parent = subParent;
+                    subParent.right = new Node(pair.getKey().toString(), (Integer) pair.getValue(), true, subParent, null, null);
+                    subParent.setCount(subParent.right.count + subParent.left.count);
+                    ptr.setCount(subParent.count + ptr.left.count);
+                    ptr.right = subParent;
+                    head = ptr;
+                } else {
+                    Node newLeaf = new Node(pair.getKey().toString(), (Integer) pair.getValue(), true, null, null, null);
+                    Node newBranch = new Node(null, (Integer) pair.getValue(), false, null,newLeaf,null);
+                    newLeaf.parent = newBranch;
+                    Node newHead = new Node(null, (Integer) pair.getValue() + ptr.count, false,null,ptr, newBranch);
+                    newBranch.parent = newHead;
+
+                    head = newHead;
+                }
+
 
             }else {
                 Node node = new Node(pair.getKey().toString(), (Integer) pair.getValue(), true, null, null, null);
