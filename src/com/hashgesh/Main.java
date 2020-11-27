@@ -30,6 +30,10 @@ public class Main {
         hmap = sortHashMapByValues();
 
         insertHashMapToTree();
+
+        TreePrinter printer = new TreePrinter();
+
+        printer.printTree(head);
     }
 
 
@@ -37,78 +41,55 @@ public class Main {
         Iterator it = hmap.entrySet().iterator();
         while (it.hasNext()) {
             Entry pair = (Entry) it.next();
-            //System.out.println(pair.getKey() + " = " + pair.getValue());
-            //it.remove(); // avoids a ConcurrentModificationException
-
             addToTree(head, pair);
         }
     }
 
     public static void addToTree(Node ptr, Entry pair) {
-        if (ptr.left == null && ptr.right == null) {
-            Node node = new Node(pair.getKey().toString(), (Integer) pair.getValue(), true, ptr, null, null);
-            ptr.left = node;
-            ptr.setCount((Integer) pair.getValue());
-        } else if (ptr.left != null && ptr.right == null) {
-            Node node = new Node(pair.getKey().toString(), (Integer) pair.getValue(), true, ptr, null, null);
-            ptr.right = node;
-            ptr.setCount(ptr.left.count + ptr.right.count);
+        String word = pair.getKey().toString();
+        Integer wordCount = (Integer) pair.getValue();
+
+        if (ptr.getLeft() == null && ptr.getRight() == null) {
+            Node node = new Node(word, wordCount, true, ptr, null, null);
+            ptr.setLeft(node);
+            ptr.setCount(wordCount);
+        } else if (ptr.getLeft() != null && ptr.getRight() == null) {
+            Node node = new Node(word, wordCount, true, ptr, null, null);
+            ptr.setRight(node);
+            ptr.setCount(ptr.getLeft().getCount() + ptr.getRight().getCount());
         } else if (ptr.isFilled()) {
 
-            if(getLeafValue(ptr.left) != getLeafValue(ptr.right)){
-                if(getLeafValue(ptr.right).equals((Integer) pair.getValue())) {
-                    Node subParent = new Node();
-                    subParent.isLeaf = false;
-                    subParent.left = ptr.right;
-                    ptr.right.parent = subParent;
-                    subParent.right = new Node(pair.getKey().toString(), (Integer) pair.getValue(), true, subParent, null, null);
-                    subParent.setCount(subParent.right.count + subParent.left.count);
-                    ptr.setCount(subParent.count + ptr.left.count);
-                    ptr.right = subParent;
+            if (ptr.getLeft().getLeafValue(ptr.getLeft()) != ptr.getRight().getLeafValue(ptr.getRight())) {
+                if (ptr.getRight().getLeafValue(ptr.getRight()).equals(wordCount)) {
+                    Node subParent = new Node(null, 0, false, ptr, ptr.getRight(), null);
+                    ptr.getRight().setParent(subParent);
+                    subParent.setRight(new Node(word, wordCount, true, subParent, null, null));
+                    subParent.setCount(subParent.getRight().getCount() + subParent.getLeft().getCount());
+                    ptr.setCount(subParent.getCount() + ptr.getLeft().getCount());
+                    ptr.setRight(subParent);
+                    ptr.getLeft().setParent(ptr);
+
                     head = ptr;
                 } else {
-                    Node newLeaf = new Node(pair.getKey().toString(), (Integer) pair.getValue(), true, null, null, null);
-                    Node newBranch = new Node(null, (Integer) pair.getValue(), false, null,newLeaf,null);
-                    newLeaf.parent = newBranch;
-                    Node newHead = new Node(null, (Integer) pair.getValue() + ptr.count, false,null,ptr, newBranch);
-                    newBranch.parent = newHead;
+                    Node newLeaf = new Node(word, wordCount, true, null, null, null);
+                    Node newBranch = new Node(null, wordCount, false, null, newLeaf, null);
+                    newLeaf.setParent(newBranch);
+                    Node newHead = new Node(null, wordCount + ptr.getCount(), false, null, ptr, newBranch);
+                    newBranch.setParent(newHead);
 
                     head = newHead;
                 }
 
-
-            }else {
-                Node node = new Node(pair.getKey().toString(), (Integer) pair.getValue(), true, null, null, null);
-
-                Node newParent = new Node(null, ptr.count + node.count, false, null, ptr, node);
-
-                node.parent = newParent;
-
+            } else {
+                Node node = new Node(word, wordCount, true, null, null, null);
+                Node newParent = new Node(null, ptr.getCount() + node.getCount(), false, null, ptr, node);
+                node.setParent(newParent);
                 head = newParent;
             }
         }
     }
 
-    public static Node leafExists(Node ptr, Integer value) {
-        Node current = ptr;
 
-        if (current == null)
-            return null;
-
-        if (current.count == value) {
-            return current;
-        }
-
-        return leafExists(ptr.right, value);
-    }
-
-    public static Integer getLeafValue(Node ptr){
-         Node current = ptr;
-         if(current.isLeaf){
-             return current.count;
-         }
-         return getLeafValue(current.left);
-    }
 
     public static void addContentToHashMap(List<String> lineList) {
         lineList.forEach(line -> {
@@ -185,5 +166,6 @@ public class Main {
         return str.split(" ");
     }
     //#endregion
+
 
 }
