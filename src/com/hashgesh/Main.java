@@ -36,7 +36,6 @@ public class Main {
         printer.printTree(head);
     }
 
-
     public static void insertHashMapToTree() {
         Iterator it = hmap.entrySet().iterator();
         while (it.hasNext()) {
@@ -88,8 +87,6 @@ public class Main {
             }
         }
     }
-
-
 
     public static void addContentToHashMap(List<String> lineList) {
         lineList.forEach(line -> {
@@ -143,7 +140,7 @@ public class Main {
 
     public static void initHead() {
         head = new Node();
-        head.isLeaf = false;
+        head.setLeaf(false);
     }
     //#endregion Initializations
 

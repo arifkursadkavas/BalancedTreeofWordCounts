@@ -2,13 +2,13 @@ package com.hashgesh;
 
 public class Node {
 
-    public String  word;
-    public int     count;
-    public boolean isLeaf;
+    private String  word;
+    private int     count;
+    private boolean isLeaf;
 
-    public Node parent;
-    public Node left;
-    public Node right;
+    private Node parent;
+    private Node left;
+    private Node right;
 
     public Node() {
     }
